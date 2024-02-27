@@ -1,16 +1,17 @@
 #!/bin/bash
-PASSLESS_ENTRY="/users/sgbhat3/.ssh/id_rsa"
+PASSLESS_ENTRY="/users/JiyuHu23/.ssh/dassl_rsa"
 
 # remote_nodes=("034" "078" "097" "007" "090" "030" "096" "116")
 # ips=("3" "4" "2" "1" "5" "6" "7" "8")
 
-benchmark_dir="/proj/rasl-PG0/sgbhat3/scalog/lazylog-benchmarking"
+benchmark_dir="/proj/rasl-PG0/jiyu/scalog-benchmarking/lazylog-benchmarking"
+ssh_user="JiyuHu23"
 
 # index into remote_nodes/ips for order nodes
-order=("007" "090" "030")
+order=("093" "177" "176")
 
 # index into remote_nodes/ips for data shards
-data_0=("096" "116")
+data_0=("107" "166")
 
 client_nodes=("034")
 
@@ -35,8 +36,8 @@ start_order_nodes() {
     # start order nodes
     for ((i=0; i<=2; i++))
     do
-        echo "Starting order-${i} on sgbhat3@hp${order[$i]}.utah.cloudlab.us"
-        ssh -i $PASSLESS_ENTRY "sgbhat3@hp${order[$i]}.utah.cloudlab.us" "sh -c \"cd $benchmark_dir/order-$i; nohup sudo ./run_goreman.sh > /users/sgbhat3/scalog-storage/order-$i.log 2>&1 &\""
+        echo "Starting order-${i} on ${ssh_user}@hp${order[$i]}.utah.cloudlab.us"
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${order[$i]}.utah.cloudlab.us" "sh -c \"cd $benchmark_dir/order-$i; nohup sudo ./run_goreman.sh > ~/scalog-storage/order-$i.log 2>&1 &\""
     done
 }
 
@@ -44,8 +45,8 @@ start_data_nodes() {
     # start data nodes
     for ((i=0; i<=1; i++))
     do
-        echo "Starting data-0-${i} on sgbhat3@hp${data_0[$i]}.utah.cloudlab.us"
-        ssh -i $PASSLESS_ENTRY "sgbhat3@hp${data_0[$i]}.utah.cloudlab.us" "sh -c \"cd $benchmark_dir/data-0-$i; nohup sudo ./run_goreman.sh > /users/sgbhat3/scalog-storage/data-0-$i.log 2>&1 &\""
+        echo "Starting data-0-${i} on ${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us"
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us" "sh -c \"cd $benchmark_dir/data-0-$i; nohup sudo ./run_goreman.sh > ~/scalog-storage/data-0-$i.log 2>&1 &\""
     done
 }
 
