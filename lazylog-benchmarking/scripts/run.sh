@@ -13,7 +13,7 @@ order=("093" "177" "176")
 # index into remote_nodes/ips for data shards
 data_0=("107" "166")
 
-client_nodes=("034")
+client_nodes=("109" "167")
 
 cleanup_servers() {
     # kill existing servers
@@ -29,7 +29,7 @@ cleanup_servers_wo_log_clear() {
 }
 
 cleanup_client() {
-    ssh -i $PASSLESS_ENTRY "sgbhat3@hp$1.utah.cloudlab.us" "cd $benchmark_dir/scripts; sudo pkill -f \"append_bench\""
+    ssh -i $PASSLESS_ENTRY "${ssh_user}@hp$1.utah.cloudlab.us" "cd $benchmark_dir/scripts; sudo pkill -f \"append_bench\""
 }
 
 start_order_nodes() {
@@ -52,13 +52,13 @@ start_data_nodes() {
 
 start_discovery() {
     # start discovery
-    echo "Starting discovery on sgbhat3@hp${data_0[0]}.utah.cloudlab.us"
-    ssh -i $PASSLESS_ENTRY "sgbhat3@hp${data_0[0]}.utah.cloudlab.us" "sh -c \"cd $benchmark_dir/disc; nohup sudo ./run_goreman.sh > /users/sgbhat3/scalog-storage/disc.log 2>&1 &\""
+    echo "Starting discovery on ${ssh_user}@hp${data_0[0]}.utah.cloudlab.us"
+    ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[0]}.utah.cloudlab.us" "sh -c \"cd $benchmark_dir/disc; nohup sudo ./run_goreman.sh > ~/scalog-storage/disc.log 2>&1 &\""
 }
 
 
 start_client() {
-    ssh -i $PASSLESS_ENTRY sgbhat3@hp$1.utah.cloudlab.us "cd $benchmark_dir/scripts; sudo ./run_client.sh $2 $3 $1 $4 > client_$1.log 2>&1" &
+    ssh -i $PASSLESS_ENTRY ${ssh_user}@hp$1.utah.cloudlab.us "cd $benchmark_dir/scripts; sudo ./run_client.sh $2 $3 $1 $4 > client_$1.log 2>&1" &
 }
 
 # single client
@@ -90,7 +90,7 @@ do
     do
         # run client
         # start_client <client_id> <num_of_clients_to_run> <num_appends_per_client> <total_clients>
-        start_client $client_node $(($c/$num_client_nodes)) "4m" $c
+        start_client $client_node $(($c/$num_client_nodes)) "2m" $c
     done
 
     echo "Waiting for clients to terminate"
