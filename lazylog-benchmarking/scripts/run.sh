@@ -37,7 +37,7 @@ start_order_nodes() {
     for ((i=0; i<=2; i++))
     do
         echo "Starting order-${i} on ${ssh_user}@hp${order[$i]}.utah.cloudlab.us"
-        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${order[$i]}.utah.cloudlab.us" "sh -c \"cd $benchmark_dir/order-$i; nohup sudo ./run_goreman.sh > ~/scalog-storage/order-$i.log 2>&1 &\""
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${order[$i]}.utah.cloudlab.us" "cd $benchmark_dir/order-$i; nohup sudo ./run_goreman.sh > /users/JiyuHu23/scalog-storage/order-$i.log 2>&1 &"
     done
 }
 
@@ -46,19 +46,19 @@ start_data_nodes() {
     for ((i=0; i<=1; i++))
     do
         echo "Starting data-0-${i} on ${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us"
-        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us" "sh -c \"cd $benchmark_dir/data-0-$i; nohup sudo ./run_goreman.sh > ~/scalog-storage/data-0-$i.log 2>&1 &\""
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us" "cd $benchmark_dir/data-0-$i; nohup sudo ./run_goreman.sh > /users/JiyuHu23/scalog-storage/data-0-$i.log 2>&1 &"
     done
 }
 
 start_discovery() {
     # start discovery
     echo "Starting discovery on ${ssh_user}@hp${data_0[0]}.utah.cloudlab.us"
-    ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[0]}.utah.cloudlab.us" "sh -c \"cd $benchmark_dir/disc; nohup sudo ./run_goreman.sh > ~/scalog-storage/disc.log 2>&1 &\""
+    ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[0]}.utah.cloudlab.us" "cd $benchmark_dir/disc; nohup sudo ./run_goreman.sh > /users/JiyuHu23/scalog-storage/disc.log 2>&1 &"
 }
 
 
 start_client() {
-    ssh -i $PASSLESS_ENTRY ${ssh_user}@hp$1.utah.cloudlab.us "cd $benchmark_dir/scripts; sudo ./run_client.sh $2 $3 $1 $4 > client_$1.log 2>&1" &
+    ssh -i $PASSLESS_ENTRY ${ssh_user}@hp$1.utah.cloudlab.us "cd $benchmark_dir/scripts; sudo ./run_client.sh $2 $3 $1 $4 > /users/JiyuHu23/scalog-storage/client_$1.log 2>&1" &
 }
 
 # single client
@@ -101,4 +101,5 @@ do
         cleanup_client $client_node
     done
     cleanup_servers_wo_log_clear
+    rm ./*.log
 done

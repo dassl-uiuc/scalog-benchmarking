@@ -1,6 +1,6 @@
 #!/bin/bash
 
-remote_nodes=("109" "167" "103" "093" "177" "176" "107" "166")
+remote_nodes=("093" "177" "176" "107" "166")
 PASSLESS_ENTRY="/users/JiyuHu23/.ssh/dassl_rsa"
 SSH_USER="JiyuHu23"
 
