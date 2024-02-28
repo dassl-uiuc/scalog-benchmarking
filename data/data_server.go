@@ -264,9 +264,11 @@ func (s *DataServer) processReplicate() {
 		if err != nil {
 			log.Fatalf("Write to storage failed: %v", err)
 		}
-		s.recordsMu.Lock()
-		s.records[lsn] = record
-		s.recordsMu.Unlock()
+		if record.LocalReplicaID == s.replicaID {
+			s.recordsMu.Lock()
+			s.records[lsn] = record
+			s.recordsMu.Unlock()
+		}
 		s.localCutMu.Lock()
 		s.localCut[record.LocalReplicaID] = lsn + 1
 		s.localCutMu.Unlock()

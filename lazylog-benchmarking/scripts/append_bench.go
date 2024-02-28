@@ -36,7 +36,7 @@ func AppendOneWithTimeout(cli *client.Client, record string) (int64, int32, erro
 		select {
 		case res := <-channel:
 			return res.gsn, res.shard, res.err
-		case <-time.After(20 * time.Millisecond):
+		case <-time.After(100 * time.Millisecond):
 			numTimeouts = numTimeouts + 1
 			continue
 		}

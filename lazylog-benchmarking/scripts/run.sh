@@ -61,19 +61,17 @@ start_client() {
     ssh -i $PASSLESS_ENTRY ${ssh_user}@hp$1.utah.cloudlab.us "cd $benchmark_dir/scripts; sudo ./run_client.sh $2 $3 $1 $4 > /users/JiyuHu23/scalog-storage/client_$1.log 2>&1" &
 }
 
-# single client
-#clients=("512" "256" "128" "64" "30" "25" "20" "18" "16" "12" "10" "8" "6" "4" "2" "1")
 
-# two clients
-# clients=("600" "700" "800" "900" "1000" "1200" "1300")
-clients=("10")
+# clients
+# clients=("1300" "1200" "1000" "900" "800" "700" "600" "512" "256" "128" "64" "30" "25" "20" "18" "16" "12" "10" "8" "6" "4" "2")
+# clients=("1300")
 
-for c in "${clients[@]}"; 
-do
-    for client_node in "${client_nodes[@]}";
-    do
-        cleanup_client $client_node
-    done 
+# for c in "${clients[@]}"; 
+# do
+#     for client_node in "${client_nodes[@]}";
+#     do
+#         cleanup_client $client_node
+#     done 
 
     cleanup_servers
 
@@ -81,10 +79,10 @@ do
     start_data_nodes 
     start_discovery
 
-    # wait for 10 secs
-    sleep 10
+#     # wait for 10 secs
+#     sleep 10
 
-    num_client_nodes=${#client_nodes[@]}
+#     num_client_nodes=${#client_nodes[@]}
 
     for client_node in "${client_nodes[@]}";
     do
@@ -93,8 +91,8 @@ do
         start_client $client_node $(($c/$num_client_nodes)) "2m" $c
     done
 
-    echo "Waiting for clients to terminate"
-    wait
+#     echo "Waiting for clients to terminate"
+#     wait
 
     for client_node in "${client_nodes[@]}";
     do
