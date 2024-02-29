@@ -5,6 +5,7 @@ PASSLESS_ENTRY="/users/JiyuHu23/.ssh/dassl_rsa"
 # ips=("3" "4" "2" "1" "5" "6" "7" "8")
 
 benchmark_dir="/proj/rasl-PG0/jiyu/scalog-benchmarking/lazylog-benchmarking"
+log_dir="/users/JiyuHu23/scalog-storage"
 ssh_user="JiyuHu23"
 
 # index into remote_nodes/ips for order nodes
@@ -37,7 +38,7 @@ start_order_nodes() {
     for ((i=0; i<=2; i++))
     do
         echo "Starting order-${i} on ${ssh_user}@hp${order[$i]}.utah.cloudlab.us"
-        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${order[$i]}.utah.cloudlab.us" "cd $benchmark_dir/order-$i; nohup sudo ./run_goreman.sh > /users/JiyuHu23/scalog-storage/order-$i.log 2>&1 &"
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${order[$i]}.utah.cloudlab.us" "cd $benchmark_dir/order-$i; nohup sudo ./run_goreman.sh > ${log_dir}/order-$i.log 2>&1 &"
     done
 }
 
@@ -46,32 +47,47 @@ start_data_nodes() {
     for ((i=0; i<=1; i++))
     do
         echo "Starting data-0-${i} on ${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us"
-        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us" "cd $benchmark_dir/data-0-$i; nohup sudo ./run_goreman.sh > /users/JiyuHu23/scalog-storage/data-0-$i.log 2>&1 &"
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us" "cd $benchmark_dir/data-0-$i; nohup sudo ./run_goreman.sh > ${log_dir}/data-0-$i.log 2>&1 &"
     done
 }
 
 start_discovery() {
     # start discovery
     echo "Starting discovery on ${ssh_user}@hp${data_0[0]}.utah.cloudlab.us"
-    ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[0]}.utah.cloudlab.us" "cd $benchmark_dir/disc; nohup sudo ./run_goreman.sh > /users/JiyuHu23/scalog-storage/disc.log 2>&1 &"
+    ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[0]}.utah.cloudlab.us" "cd $benchmark_dir/disc; nohup sudo ./run_goreman.sh > ${log_dir}/disc.log 2>&1 &"
 }
 
 
 start_client() {
-    ssh -i $PASSLESS_ENTRY ${ssh_user}@hp$1.utah.cloudlab.us "cd $benchmark_dir/scripts; sudo ./run_client.sh $2 $3 $1 $4 > /users/JiyuHu23/scalog-storage/client_$1.log 2>&1" &
+    ssh -i $PASSLESS_ENTRY ${ssh_user}@hp$1.utah.cloudlab.us "cd $benchmark_dir/scripts; sudo ./run_client.sh $2 $3 $1 $4 > ${log_dir}/client_$1.log 2>&1" &
 }
 
+check_data_log() {
+    for ((i=0; i<=1; i++))
+    do
+        echo "Checking data node $i..."
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us" "grep error ${log_dir}/data-0-$i.log"
+    done
+}
 
-# clients
-# clients=("1300" "1200" "1000" "900" "800" "700" "600" "512" "256" "128" "64" "30" "25" "20" "18" "16" "12" "10" "8" "6" "4" "2")
-# clients=("1300")
+# single client
+# clients=("700" "512" "256" "128" "64" "30" "24" "20" "18" "16" "12")
+# clients=("12")
 
-# for c in "${clients[@]}"; 
-# do
-#     for client_node in "${client_nodes[@]}";
-#     do
-#         cleanup_client $client_node
-#     done 
+clients=("800")
+# two clients
+# clients=("600" "700" "800" "900" "1000" "1200")
+# clients=("10")
+
+len=${#clients[@]}
+# for ((i = len - 1; i >= 0; i--));
+for c in "${clients[@]}"; 
+do
+    # c="${clients[i]}"
+    for client_node in "${client_nodes[@]}";
+    do
+        cleanup_client $client_node
+    done 
 
     cleanup_servers
 
@@ -79,10 +95,10 @@ start_client() {
     start_data_nodes 
     start_discovery
 
-#     # wait for 10 secs
-#     sleep 10
+    # wait for 10 secs
+    sleep 10
 
-#     num_client_nodes=${#client_nodes[@]}
+    num_client_nodes=${#client_nodes[@]}
 
     for client_node in "${client_nodes[@]}";
     do
@@ -91,13 +107,13 @@ start_client() {
         start_client $client_node $(($c/$num_client_nodes)) "2m" $c
     done
 
-#     echo "Waiting for clients to terminate"
-#     wait
+    echo "Waiting for clients to terminate"
+    wait
 
     for client_node in "${client_nodes[@]}";
     do
         cleanup_client $client_node
     done
     cleanup_servers_wo_log_clear
-    rm ./*.log
+    check_data_log
 done
