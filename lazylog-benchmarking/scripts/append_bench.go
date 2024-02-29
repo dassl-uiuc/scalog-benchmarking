@@ -104,9 +104,9 @@ func main() {
 		dataGenTimes = append(dataGenTimes, dataGenEndTime.Sub(dataGenStartTime))
 		runTimes = append(runTimes, runEndTime.Sub(runStartTime))
 		numberOfRequest++
-		if numberOfRequest%500 == 0 {
-			_, _ = fmt.Printf("executing %d\n", numberOfRequest)
-		}
+		// if numberOfRequest%500 == 0 {
+		// 	_, _ = fmt.Printf("executing %d\n", numberOfRequest)
+		// }
 		select {
 		case <-timeout:
 			stay = false

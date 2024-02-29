@@ -14,7 +14,7 @@ order=("093" "177" "176")
 # index into remote_nodes/ips for data shards
 data_0=("107" "166")
 
-client_nodes=("109" "167")
+client_nodes=("109" "167" "103")
 
 cleanup_servers() {
     # kill existing servers
@@ -61,7 +61,7 @@ check_data_log() {
     for ((i=0; i<=1; i++))
     do
         echo "Checking data node $i..."
-        ssh -i $PASSLESS_ENTRY "sgbhat3@hp${data_0[$i]}.utah.cloudlab.us" "grep error /users/sgbhat3/scalog-storage/data-0-$i.log"
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us" "grep error ${log_dir}/scalog-storage/data-0-$i.log"
     done
 }
 
@@ -78,10 +78,11 @@ check_data_log() {
 }
 
 # single client
-# clients=("700" "512" "256" "128" "64" "30" "24" "20" "18" "16" "12")
-# clients=("12")
+# clients=("1300" "1000" "1000" "700" "512" "256" "128" "64" "30" "24" "20" "18" "16" "12")
+# clients=("1800" "1500" "1300" "1000" "700" "600" "500")
+clients=("500" "600" "700" "1000" "1300" "1500" "1800" "2100")
+# clients=("1800")
 
-clients=("800")
 # two clients
 # clients=("600" "700" "800" "900" "1000" "1200")
 # clients=("10")
@@ -111,7 +112,7 @@ do
     do
         # run client
         # start_client <client_id> <num_of_clients_to_run> <num_appends_per_client> <total_clients>
-        start_client $client_node $(($c/$num_client_nodes)) "2m" $c
+        start_client $client_node $(($c/$num_client_nodes)) "4m" $c
     done
 
     echo "Waiting for clients to terminate"

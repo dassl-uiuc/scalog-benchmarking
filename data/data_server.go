@@ -80,14 +80,14 @@ func NewDataServer(replicaID, shardID, numReplica int32, batchingInterval time.D
 	s.ackSendC = make(map[int32]chan *datapb.Ack)
 	s.subC = make(map[int32]chan *datapb.Record)
 	s.ackC = make(chan *datapb.Ack, 4096)
-	s.appendC = make(chan *datapb.Record, 4096)
+	s.appendC = make(chan *datapb.Record, 8192)
 	s.replicateC = make(chan *datapb.Record, 4096)
 	s.replicateSendC = make([]chan *datapb.Record, numReplica)
 	s.peerDoneC = make([]chan interface{}, numReplica)
 	s.wait = make(map[int64]chan *datapb.Ack)
 	s.prevCommittedCut = &orderpb.CommittedCut{}
 	s.records = make(map[int64]*datapb.Record)
-	path := fmt.Sprintf("/users/sgbhat3/scalog-storage/storage-%v-%v", shardID, replicaID) // TODO configure path
+	path := fmt.Sprintf("/users/JiyuHu23/scalog-storage/storage-%v-%v", shardID, replicaID) // TODO configure path
 	segLen := int32(50000)                                                                 // TODO configurable segment length
 	storage, err := storage.NewStorage(path, replicaID, numReplica, segLen)
 	if err != nil {

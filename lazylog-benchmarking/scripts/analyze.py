@@ -34,10 +34,12 @@ def calculate_avg_throughput_latency(directory, num_bytes_per_op):
             return (None, None)
     return (None, None)
 
-clients = [2, 4, 6, 8, 10, 12, 16, 18, 20, 24, 30, 64, 128, 256, 512, 600, 700, 800, 900, 1000, 1200, 1300]
+# clients = [700, 1000, 1300, 1500, 1800, 2100, 2400]
+clients = [500,600,700,1000,1300,1500,1800]
 throughput = []
 latency = []
 
+print("avg_tput")
 for n in clients:
     # Specify the directory path
     directory_path = "../append_bench_" + str(n)
@@ -46,4 +48,15 @@ for n in clients:
     average_throughput, average_latency = calculate_avg_throughput_latency(directory_path, 4096)
     throughput.append(average_throughput)
     latency.append(average_latency)
-    print(f"{n} clients\n\taverage throughput: {average_throughput} ops/sec\n\taverage latency: {average_latency} msec/op")
+    print(f"{average_throughput}")
+
+print("avg_lat")
+for n in clients:
+    # Specify the directory path
+    directory_path = "../append_bench_" + str(n)
+
+    # Calculate and print the average throughput
+    average_throughput, average_latency = calculate_avg_throughput_latency(directory_path, 4096)
+    throughput.append(average_throughput)
+    latency.append(average_latency)
+    print(f"{average_latency}")
