@@ -57,6 +57,13 @@ start_discovery() {
     ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[0]}.utah.cloudlab.us" "cd $benchmark_dir/disc; nohup sudo ./run_goreman.sh > ${log_dir}/disc.log 2>&1 &"
 }
 
+check_data_log() {
+    for ((i=0; i<=1; i++))
+    do
+        echo "Checking data node $i..."
+        ssh -i $PASSLESS_ENTRY "sgbhat3@hp${data_0[$i]}.utah.cloudlab.us" "grep error /users/sgbhat3/scalog-storage/data-0-$i.log"
+    done
+}
 
 start_client() {
     ssh -i $PASSLESS_ENTRY ${ssh_user}@hp$1.utah.cloudlab.us "cd $benchmark_dir/scripts; sudo ./run_client.sh $2 $3 $1 $4 > ${log_dir}/client_$1.log 2>&1" &
