@@ -9,3 +9,4 @@ fi
 sudo mount /dev/sda4 ~/scalog-storage
 sudo rm -rf ~/scalog-storage/*
 sudo chown JiyuHu23 ~/scalog-storage
+rm -rf ~/scalog-storage/*

@@ -18,15 +18,12 @@ client_nodes=("109" "167" "103")
 
 cleanup_servers() {
     # kill existing servers
-    sudo ./run_script_on_all.sh ./kill_all_goreman.sh
-
-    # mount storage and clear existing logs if any
-    sudo ./run_script_on_all.sh ./setup_disk.sh
+    sudo ./run_script_on_server.sh ./kill_all_goreman.sh
 }
 
 cleanup_servers_wo_log_clear() {
     # kill existing servers
-    sudo ./run_script_on_all.sh ./kill_all_goreman.sh
+    sudo ./run_script_on_server.sh ./kill_all_goreman.sh
 }
 
 cleanup_client() {
@@ -79,13 +76,18 @@ check_data_log() {
 
 # single client
 # clients=("1300" "1000" "1000" "700" "512" "256" "128" "64" "30" "24" "20" "18" "16" "12")
-# clients=("1800" "1500" "1300" "1000" "700" "600" "500")
+# clients=("1800" "1500" "1300" "1000")
 # clients=("500" "600" "700" "1000" "1300" "1500" "1800" "2100")
-clients=("1300" "1500" "1800")
+clients=("2100")
 
 # two clients
 # clients=("600" "700" "800" "900" "1000" "1200")
 # clients=("10")
+
+curr=$(pwd)
+cd ../..
+sudo /usr/local/go/bin/go build
+cd $curr
 
 len=${#clients[@]}
 # for ((i = len - 1; i >= 0; i--));
@@ -98,6 +100,9 @@ do
     done 
 
     cleanup_servers
+
+    sudo ./run_script_on_all.sh ./setup_disk.sh
+    sudo ./run_script_on_all.sh ./remove_tmp
 
     start_order_nodes
     start_data_nodes 
