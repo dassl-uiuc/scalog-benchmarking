@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 4 ]; then
-  echo "Usage: $0 <client_number> <time_limit> <client_id> <total_clients>"
+if [ "$#" -ne 5 ]; then
+  echo "Usage: $0 <client_number> <time_limit> <client_id> <total_clients> <interval>"
   exit 1
 fi
 
@@ -9,9 +9,10 @@ client_number="$1"
 time_limit="$2"
 client_id="$3"
 total_clients="$4"
+interval="$5"
 
 # output directory for the test output
-output_dir="../append_bench_${total_clients}"
+output_dir="../results/${interval}/append_bench_${total_clients}"
 sudo rm -rf $output_dir
 mkdir $output_dir
 sudo /usr/local/go/bin/go build append_bench.go

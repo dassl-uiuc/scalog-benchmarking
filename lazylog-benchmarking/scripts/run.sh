@@ -9,12 +9,17 @@ log_dir="/users/JiyuHu23/scalog-storage"
 ssh_user="JiyuHu23"
 
 # index into remote_nodes/ips for order nodes
-order=("093" "177" "176")
+order=("amd106" "amd166" "amd136")
 
 # index into remote_nodes/ips for data shards
-data_0=("107" "166")
+data_0=("amd158" "amd144")
 
-client_nodes=("109" "167" "103")
+client_nodes=("amd160" "amd107")
+
+modify_batching_intervals() {
+    sed -i "s|order-batching-interval: .*|order-batching-interval: $1|" ${benchmark_dir}/../.scalog.yaml
+    sed -i "s|data-batching-interval: .*|data-batching-interval: $1|" ${benchmark_dir}/../.scalog.yaml
+}
 
 cleanup_servers() {
     # kill existing servers
@@ -27,15 +32,15 @@ cleanup_servers_wo_log_clear() {
 }
 
 cleanup_client() {
-    ssh -i $PASSLESS_ENTRY "${ssh_user}@hp$1.utah.cloudlab.us" "cd $benchmark_dir/scripts; sudo pkill -f \"append_bench\""
+    ssh -i $PASSLESS_ENTRY "${ssh_user}@$1.utah.cloudlab.us" "cd $benchmark_dir/scripts; sudo pkill -f \"append_bench\""
 }
 
 start_order_nodes() {
     # start order nodes
     for ((i=0; i<=2; i++))
     do
-        echo "Starting order-${i} on ${ssh_user}@hp${order[$i]}.utah.cloudlab.us"
-        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${order[$i]}.utah.cloudlab.us" "cd $benchmark_dir/order-$i; nohup sudo ./run_goreman.sh > ${log_dir}/order-$i.log 2>&1 &"
+        echo "Starting order-${i} on ${ssh_user}@${order[$i]}.utah.cloudlab.us"
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@${order[$i]}.utah.cloudlab.us" "cd $benchmark_dir/order-$i; nohup sudo ./run_goreman.sh > ${log_dir}/order-$i.log 2>&1 &"
     done
 }
 
@@ -43,90 +48,92 @@ start_data_nodes() {
     # start data nodes
     for ((i=0; i<=1; i++))
     do
-        echo "Starting data-0-${i} on ${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us"
-        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us" "cd $benchmark_dir/data-0-$i; nohup sudo ./run_goreman.sh > ${log_dir}/data-0-$i.log 2>&1 &"
+        echo "Starting data-0-${i} on ${ssh_user}@${data_0[$i]}.utah.cloudlab.us"
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@${data_0[$i]}.utah.cloudlab.us" "cd $benchmark_dir/data-0-$i; nohup sudo ./run_goreman.sh > ${log_dir}/data-0-$i.log 2>&1 &"
     done
 }
 
 start_discovery() {
     # start discovery
-    echo "Starting discovery on ${ssh_user}@hp${data_0[0]}.utah.cloudlab.us"
-    ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[0]}.utah.cloudlab.us" "cd $benchmark_dir/disc; nohup sudo ./run_goreman.sh > ${log_dir}/disc.log 2>&1 &"
+    echo "Starting discovery on ${ssh_user}@${data_0[0]}.utah.cloudlab.us"
+    ssh -i $PASSLESS_ENTRY "${ssh_user}@${data_0[0]}.utah.cloudlab.us" "cd $benchmark_dir/disc; nohup sudo ./run_goreman.sh > ${log_dir}/disc.log 2>&1 &"
 }
 
 check_data_log() {
     for ((i=0; i<=1; i++))
     do
         echo "Checking data node $i..."
-        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us" "grep error ${log_dir}/scalog-storage/data-0-$i.log"
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@${data_0[$i]}.utah.cloudlab.us" "grep error ${log_dir}/scalog-storage/data-0-$i.log"
     done
 }
 
 start_client() {
-    ssh -i $PASSLESS_ENTRY ${ssh_user}@hp$1.utah.cloudlab.us "cd $benchmark_dir/scripts; sudo ./run_client.sh $2 $3 $1 $4 > ${log_dir}/client_$1.log 2>&1" &
+    ssh -i $PASSLESS_ENTRY ${ssh_user}@$1.utah.cloudlab.us "cd $benchmark_dir/scripts; sudo ./run_client.sh $2 $3 $1 $4 $5 > ${log_dir}/client_$1.log 2>&1" &
 }
 
 check_data_log() {
     for ((i=0; i<=1; i++))
     do
         echo "Checking data node $i..."
-        ssh -i $PASSLESS_ENTRY "${ssh_user}@hp${data_0[$i]}.utah.cloudlab.us" "grep error ${log_dir}/data-0-$i.log"
+        ssh -i $PASSLESS_ENTRY "${ssh_user}@${data_0[$i]}.utah.cloudlab.us" "grep error ${log_dir}/data-0-$i.log"
     done
 }
 
 # single client
 # clients=("1300" "1000" "1000" "700" "512" "256" "128" "64" "30" "24" "20" "18" "16" "12")
 # clients=("1800" "1500" "1300" "1000")
-# clients=("500" "600" "700" "1000" "1300" "1500" "1800" "2100")
-clients=("2100")
+clients=("256" "512" "700" "1000" "1300" "1500" "1800")
+# clients=("200")
 
-# two clients
-# clients=("600" "700" "800" "900" "1000" "1200")
-# clients=("10")
+batching_intervals=("0.1ms" "1ms" "10ms")
 
 curr=$(pwd)
 cd ../..
-sudo /usr/local/go/bin/go build
+sudo /usr/local/go/bin/go build -buildvcs=false
 cd $curr
+sleep 5
 
-len=${#clients[@]}
-# for ((i = len - 1; i >= 0; i--));
-for c in "${clients[@]}"; 
+for interval in "${batching_intervals[@]}";
 do
-    # c="${clients[i]}"
-    for client_node in "${client_nodes[@]}";
+    # modify intervals
+    modify_batching_intervals $interval
+    for c in "${clients[@]}"; 
     do
-        cleanup_client $client_node
-    done 
+        # c="${clients[i]}"
+        for client_node in "${client_nodes[@]}";
+        do
+            cleanup_client $client_node
+        done 
 
-    cleanup_servers
+        cleanup_servers
 
-    sudo ./run_script_on_all.sh ./setup_disk.sh
-    sudo ./run_script_on_all.sh ./remove_tmp
+        # sudo ./run_script_on_all.sh ./setup_disk.sh
+        sudo ./run_script_on_all.sh ./remove_tmp
 
-    start_order_nodes
-    start_data_nodes 
-    start_discovery
+        start_order_nodes
+        start_data_nodes 
+        start_discovery
 
-    # wait for 10 secs
-    sleep 10
+        # wait for 10 secs
+        sleep 10
 
-    num_client_nodes=${#client_nodes[@]}
+        num_client_nodes=${#client_nodes[@]}
 
-    for client_node in "${client_nodes[@]}";
-    do
-        # run client
-        # start_client <client_id> <num_of_clients_to_run> <num_appends_per_client> <total_clients>
-        start_client $client_node $(($c/$num_client_nodes)) "4m" $c
+        for client_node in "${client_nodes[@]}";
+        do
+            # run client
+            # start_client <client_id> <num_of_clients_to_run> <num_appends_per_client> <total_clients>
+            start_client $client_node $(($c/$num_client_nodes)) "4m" $c $interval
+        done
+
+        echo "Waiting for clients to terminate"
+        wait
+
+        for client_node in "${client_nodes[@]}";
+        do
+            cleanup_client $client_node
+        done
+        cleanup_servers_wo_log_clear
+        check_data_log
     done
-
-    echo "Waiting for clients to terminate"
-    wait
-
-    for client_node in "${client_nodes[@]}";
-    do
-        cleanup_client $client_node
-    done
-    cleanup_servers_wo_log_clear
-    check_data_log
 done

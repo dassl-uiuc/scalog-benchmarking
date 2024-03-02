@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # remote_nodes=("109" "167" "103" "093" "177" "176" "107" "166")
-remote_nodes=("093" "177" "176" "107" "166")
+remote_nodes=("amd106" "amd166" "amd136" "amd158" "amd144")
 # remote_nodes=("109" "167" "103")
 PASSLESS_ENTRY="/users/JiyuHu23/.ssh/dassl_rsa"
 SSH_USER="JiyuHu23"
@@ -17,6 +17,6 @@ local_script="$1"
 # Iterate over remote nodes and execute the script
 for node in "${remote_nodes[@]}"; do
     echo "Executing script on $node..."
-    ssh -i ${PASSLESS_ENTRY} "${SSH_USER}@hp$node.utah.cloudlab.us" "sudo bash -s" < "$local_script"
+    ssh -i ${PASSLESS_ENTRY} "${SSH_USER}@$node.utah.cloudlab.us" "sudo bash -s" < "$local_script"
     echo "Script execution on $node completed."
 done
