@@ -1,1 +1,7 @@
 append_bench_*
+results
+data-*
+order-*
+scripts/test.sh
+scripts/.test.yaml
+scripts/test

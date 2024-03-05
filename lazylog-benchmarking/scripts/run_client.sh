@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 5 ]; then
-  echo "Usage: $0 <client_number> <time_limit> <client_id> <total_clients> <interval>"
+if [ "$#" -ne 5 ] && [ "$#" -ne 6 ]; then
+  echo "Usage: $0 <client_number> <time_limit> <client_id> <total_clients> <interval> <(optinal)number of shards>"
   exit 1
 fi
 
@@ -10,16 +10,17 @@ time_limit="$2"
 client_id="$3"
 total_clients="$4"
 interval="$5"
+num_shard="$6"
 
 # output directory for the test output
-output_dir="../results/${interval}/append_bench_${total_clients}"
+output_dir="../results/${num_shard}/${interval}/append_bench_${total_clients}"
 sudo rm -rf $output_dir
 mkdir -p $output_dir
 sudo /usr/local/go/bin/go build append_bench.go
 
 for ((i=1; i<=$client_number; i++)); do
     request_size="4096"
-    cmd="sudo ./append_bench $time_limit $request_size ${output_dir}/<hp${client_id}>_${time_limit}_${request_size}_${i}.csv"
+    cmd="sudo ./append_bench $time_limit $request_size ${output_dir}/<${client_id}>_${time_limit}_${request_size}_${i}.csv"
     $cmd &
 done
 

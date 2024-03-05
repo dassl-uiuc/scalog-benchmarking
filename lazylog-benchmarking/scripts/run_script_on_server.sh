@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # remote_nodes=("109" "167" "103" "093" "177" "176" "107" "166")
-remote_nodes=("amd106" "amd166" "amd136" "amd158" "amd144")
+remote_nodes=("hp158" "hp127" "hp144" "hp121" "hp147" "hp021" "hp126" "hp039" "hp159" "hp038" "hp036" "hp124" "hp123")
 # remote_nodes=("109" "167" "103")
 PASSLESS_ENTRY="/users/JiyuHu23/.ssh/dassl_rsa"
 SSH_USER="JiyuHu23"
