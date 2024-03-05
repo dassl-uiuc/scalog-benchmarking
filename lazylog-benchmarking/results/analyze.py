@@ -58,7 +58,7 @@ def get_avg_throughput(directory, num_bytes_per_op):
     return None
 
 #clients = [2, 4, 6, 8, 16, 20, 32, 64, 128, 256, 512, 600, 700, 800, 900, 1000, 1200, 1300]
-shards = (1, 2, 3, 4, 5)
+shards = (1, 2, 3, 4, 5, 6)
 clients = [10]
 throughput = []
 latency = "0.1ms"

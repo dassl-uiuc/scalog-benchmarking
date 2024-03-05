@@ -6,7 +6,8 @@ log_dir="/users/JiyuHu23/scalog-storage"
 ssh_user="JiyuHu23"
 
 # index into remote_nodes/ips for order nodes
-order=("hp158" "hp127" "hp144")
+# order=("hp158" "hp127" "hp144")
+order=("hp158")
 
 # index into remote_nodes/ips for data shards
 data=(
@@ -15,6 +16,7 @@ data=(
     "hp039 hp159"
     "hp038 hp036"
     "hp124 hp123"
+    "hp127 hp144"
 )
 
 client_nodes=("hp136" "hp034" "hp007")
@@ -33,14 +35,15 @@ modify_batching_intervals() {
 }
 
 forge_yaml() {
+    order_num="${#order[@]}"
     cat <<EOF > ${benchmark_dir}/../.scalog.yaml
 order-port: 26733
 raft-port: 27238
-order-replication-factor: 3
+order-replication-factor: $order_num
 order-batching-interval: 0.1ms
 EOF
 
-    for ((i=0; i<3; i++))
+    for ((i=0; i<$order_num; i++))
     do
         get_node_ip ${order[$i]}
         echo "order-$i-ip: \"${node_ip}\"" >> ${benchmark_dir}/../.scalog.yaml
@@ -112,7 +115,7 @@ cleanup_client() {
 
 start_order_nodes() {
     # start order nodes
-    for ((i=0; i<=2; i++))
+    for ((i=0; i<$1; i++))
     do
         echo "Starting order-${i} on ${ssh_user}@${order[$i]}.utah.cloudlab.us"
         ssh -i $PASSLESS_ENTRY "${ssh_user}@${order[$i]}.utah.cloudlab.us" "cd $benchmark_dir/order-$i; nohup sudo ./run_goreman.sh > ${log_dir}/order-$i.log 2>&1 &"
@@ -158,7 +161,7 @@ start_client() {
 # single client
 # clients=("1300" "1000" "1000" "700" "512" "256" "128" "64" "30" "24" "20" "18" "16" "12")
 # clients=("1800" "1500" "1300" "1000")
-clients=("32")
+clients=("10")
 # clients=("200")
 
 batching_intervals=("0.1ms")
@@ -196,7 +199,8 @@ do
             # sudo ./run_script_on_all.sh ./setup_disk.sh
             sudo ./run_script_on_all.sh ./remove_tmp
 
-            start_order_nodes
+            order_num="${#order[@]}"
+            start_order_nodes $order_num
             start_data_nodes $num_s
             start_discovery
 
