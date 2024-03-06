@@ -58,8 +58,8 @@ def get_avg_throughput(directory, num_bytes_per_op):
     return None
 
 #clients = [2, 4, 6, 8, 16, 20, 32, 64, 128, 256, 512, 600, 700, 800, 900, 1000, 1200, 1300]
-shards = (1, 2, 3, 4, 5, 6)
-clients = [10]
+shards = (1, 2, 3, 4, 5)
+clients = [90]
 throughput = []
 latency = "0.1ms"
 
@@ -78,4 +78,8 @@ for m in shards:
             print("warning! timeouts detected in measurements")
 
         # print(f"{n},{avg_tput},{mean},{p50},{p99}")
-        print(f"{avg_tput}")
+        print(f"{mean}")
+        throughput.append(avg_tput)
+
+for i in throughput:
+    print(i)
