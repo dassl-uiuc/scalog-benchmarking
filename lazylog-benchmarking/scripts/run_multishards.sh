@@ -6,8 +6,8 @@ log_dir="/users/JiyuHu23/scalog-storage"
 ssh_user="JiyuHu23"
 
 # index into remote_nodes/ips for order nodes
-# order=("hp158" "hp127" "hp144")
-order=("hp158")
+order=("hp158" "hp127" "hp144")
+# order=("hp158")
 
 # index into remote_nodes/ips for data shards
 data=(
@@ -16,7 +16,7 @@ data=(
     "hp039 hp159"
     "hp038 hp036"
     "hp124 hp123"
-    "hp127 hp144"
+    # "hp127 hp144"
 )
 
 client_nodes=("hp136" "hp034" "hp007")
@@ -161,7 +161,7 @@ start_client() {
 # single client
 # clients=("1300" "1000" "1000" "700" "512" "256" "128" "64" "30" "24" "20" "18" "16" "12")
 # clients=("1800" "1500" "1300" "1000")
-clients=("10")
+clients=("80")
 # clients=("200")
 
 batching_intervals=("0.1ms")

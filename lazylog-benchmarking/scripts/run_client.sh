@@ -19,7 +19,7 @@ mkdir -p $output_dir
 sudo /usr/local/go/bin/go build append_bench.go
 
 for ((i=1; i<=$client_number; i++)); do
-    request_size="1024"
+    request_size="4096"
     cmd="sudo ./append_bench $time_limit $request_size ${output_dir}/<${client_id}>_${time_limit}_${request_size}_${i}.csv"
     $cmd &
 done

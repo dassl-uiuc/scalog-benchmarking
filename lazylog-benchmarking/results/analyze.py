@@ -59,8 +59,10 @@ def get_avg_throughput(directory, num_bytes_per_op):
 
 #clients = [2, 4, 6, 8, 16, 20, 32, 64, 128, 256, 512, 600, 700, 800, 900, 1000, 1200, 1300]
 shards = (1, 2, 3, 4, 5)
-clients = [90]
+clients = [80]
 throughput = []
+tail_50 = []
+tail_99 = []
 latency = "0.1ms"
 
 print(f"#clients,avg tput(ops/sec),avg latency(ms/op),p50 latency(ms/op),p99 latency(ms/op)")
@@ -80,6 +82,17 @@ for m in shards:
         # print(f"{n},{avg_tput},{mean},{p50},{p99}")
         print(f"{mean}")
         throughput.append(avg_tput)
+        tail_50.append(p50)
+        tail_99.append(p99)
 
+print("\nTput")
 for i in throughput:
+    print(i)
+
+print("\nP50")
+for i in tail_50:
+    print(i)
+
+print("\nP99")
+for i in tail_99:
     print(i)

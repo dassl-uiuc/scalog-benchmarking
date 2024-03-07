@@ -9,12 +9,15 @@ log_dir="/users/JiyuHu23/scalog-storage"
 ssh_user="JiyuHu23"
 
 # index into remote_nodes/ips for order nodes
-order=("amd106" "amd166" "amd136")
+# order=("amd106" "amd166" "amd136")
+order=("hp158" "hp127" "hp144")
 
 # index into remote_nodes/ips for data shards
-data_0=("amd158" "amd144")
+# data_0=("amd158" "amd144")
+data_0=("hp121" "hp147")
 
-client_nodes=("amd160" "amd107")
+# client_nodes=("amd160" "amd107")
+client_nodes=("hp136" "hp034" "hp007")
 
 modify_batching_intervals() {
     sed -i "s|order-batching-interval: .*|order-batching-interval: $1|" ${benchmark_dir}/../.scalog.yaml
@@ -82,10 +85,10 @@ check_data_log() {
 # single client
 # clients=("1300" "1000" "1000" "700" "512" "256" "128" "64" "30" "24" "20" "18" "16" "12")
 # clients=("1800" "1500" "1300" "1000")
-clients=("1300")
+clients=("1800" "1500" "1300" "1000")
 # clients=("200")
 
-batching_intervals=("0.1ms" "1ms" "10ms")
+batching_intervals=("0.1ms")
 
 curr=$(pwd)
 cd ../..
